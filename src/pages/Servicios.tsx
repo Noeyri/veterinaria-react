@@ -48,10 +48,11 @@ export default function Servicios() {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    const datos = new FormData(e.currentTarget)
     const guardado = await guardar({
       ...(servicioEditado ? { id: servicioEditado.id } : {}),
-      nombre: formulario.nombre.trim(),
-      precio: Number(formulario.precio),
+      nombre: String(datos.get('nombre') ?? '').trim(),
+      precio: Number(datos.get('precio')),
     })
     if (!guardado) return
     cancelarEdicion()
@@ -85,6 +86,7 @@ export default function Servicios() {
               <label htmlFor="servicio-nombre" className="form-label">Nombre del servicio</label>
               <input
                 id="servicio-nombre"
+                name="nombre"
                 className="form-control"
                 required
                 maxLength={80}
@@ -96,6 +98,7 @@ export default function Servicios() {
               <label htmlFor="servicio-precio" className="form-label">Precio (S/)</label>
               <input
                 id="servicio-precio"
+                name="precio"
                 type="number"
                 className="form-control"
                 required

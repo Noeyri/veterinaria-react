@@ -1,8 +1,14 @@
-// Cliente HTTP base de la capa de servicios (Fetch API).
-// Todos los servicios de recursos (mascotas, citas, ...) pasan por aquí.
+import axios, { type AxiosRequestConfig } from 'axios'
 
 const HOST = typeof window !== 'undefined' ? window.location.hostname : '127.0.0.1'
-const BASE_URL: string = (import.meta.env.VITE_API_URL ?? `http://${HOST}:3001`).replace(/\/+$/, '')
+export const API_BASE_URL: string = (import.meta.env.VITE_API_URL ?? `http://${HOST}:3001`).replace(/\/+$/, '')
+
+export const axiosClient = axios.create({
+  baseURL: API_BASE_URL,
+  withCredentials: true,
+  headers: { 'Content-Type': 'application/json' },
+  transitional: { silentJSONParsing: false },
+})
 
 export class ApiError extends Error {
   status: number
@@ -14,47 +20,35 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  let response: Response
+async function request<T>(path: string, config?: AxiosRequestConfig): Promise<T> {
   try {
-    const headers = new Headers(init?.headers)
-    if (!headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
-    response = await fetch(`${BASE_URL}${path}`, {
-      ...init,
-      credentials: 'include',
-      headers,
-    })
-  } catch {
-    throw new ApiError('No se pudo conectar con el servidor. ¿Está corriendo la API (npm run api)?', 0)
-  }
+    const response = await axiosClient.request<T>({ ...config, url: path })
+    if (response.status === 204) return undefined as T
+    return response.data
+  } catch (cause) {
+    if (!axios.isAxiosError(cause)) throw cause
 
-  if (!response.ok) {
-    let message = `Error ${response.status}: ${response.statusText || 'petición fallida'}`
-    try {
-      const body: unknown = await response.json()
-      if (body && typeof body === 'object' && 'error' in body && typeof body.error === 'string') {
-        message = body.error
-      }
-    } catch {
-      // Algunas respuestas de error no incluyen un cuerpo JSON.
+    const status = cause.response?.status ?? 0
+    if (cause.code === 'ERR_BAD_RESPONSE' && status > 0 && status < 400) {
+      throw new ApiError('La respuesta del servidor no es un JSON válido.', status)
     }
-    throw new ApiError(message, response.status)
-  }
+    if (!cause.response) {
+      throw new ApiError('No se pudo conectar con el servidor. ¿Está corriendo la API (npm run api)?', 0)
+    }
 
-  if (response.status === 204) return undefined as T
-
-  try {
-    return (await response.json()) as T
-  } catch {
-    throw new ApiError('La respuesta del servidor no es un JSON válido.', response.status)
+    const body: unknown = cause.response.data
+    const message = body && typeof body === 'object' && 'error' in body && typeof body.error === 'string'
+      ? body.error
+      : `Error ${status}: ${cause.response.statusText || 'petición fallida'}`
+    throw new ApiError(message, status)
   }
 }
 
 export const http = {
   get: <T>(path: string) => request<T>(path),
   post: <T, B>(path: string, body: B) =>
-    request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
+    request<T>(path, { method: 'POST', data: body }),
   put: <T, B>(path: string, body: B) =>
-    request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
+    request<T>(path, { method: 'PUT', data: body }),
   delete: (path: string) => request<void>(path, { method: 'DELETE' }),
 }

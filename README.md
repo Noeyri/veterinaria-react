@@ -44,13 +44,37 @@ Ejecuta `npm run test:auth` para validar autenticación y permisos de API.
 ## Estructura
 - `src/context` – `ThemeContext` (tema claro/oscuro) y `SessionContext` (sesión), consumidos con `useContext`
 - `backend` – API Express protegida, autenticación de sesión, permisos por rol y alta local de cuentas
-- `src/services` – capa de datos: `http.ts` (Fetch con cookie y validación de `response.ok`), un servicio por recurso (`getAll`, `getById`, `create`, `update`, `delete` → GET/POST/PUT/DELETE), `authService.ts` y `sistemaService.ts` (promesas locales estables para `use()`)
+- `src/services` – capa de datos: `http.ts` (Axios con cookie y errores normalizados), `alova.ts` (Alova sobre la misma instancia Axios), un servicio por recurso (`getAll`, `getById`, `create`, `update`, `delete` → GET/POST/PUT/DELETE), `authService.ts` y `sistemaService.ts` (promesas locales estables para `use()`)
 - `src/hooks` – `useFetch` (GET) y `useMutation` (escrituras) con estados `loading`, `data` y `error`
 - `src/components` – Navbar, tarjetas (`PetCard`, `ServiceCard`), formularios, `AsyncState`, `ErrorBoundary`, `AvisosSistema`, `DuenoForm`, `FooterClinica`
 - `src/pages` – vistas de la aplicación
-- `db.json` – datos de la API
+- `db.json` – datos activos de la API
+- `db.restore.json` – copia de los datos iniciales para restaurar la base
+
+### Restaurar los datos iniciales
+
+La API guarda los cambios en `db.json`. Para volver al conjunto de datos inicial, detén
+el backend y copia `db.restore.json` sobre `db.json`. Esto reemplaza todos los cambios
+realizados en la base activa.
+
+En PowerShell:
+
+```powershell
+Copy-Item db.restore.json db.json -Force
+```
+
+En macOS/Linux:
+
+```bash
+cp db.restore.json db.json
+```
+
+Después, inicia de nuevo el backend con `npm run api` o la aplicación completa con
+`npm start`. `db.restore.json` no se modifica cuando se usa la aplicación; conserva la
+copia inicial para futuras restauraciones.
 
 ## Capa global y datos
 - **useContext**: `useTheme()` y `useSession()` evitan el *prop drilling* (Navbar, Inicio, Login los leen directamente).
 - **use() + Suspense**: `AvisosSistema` (en Inicio) y `FooterClinica` (en App) leen promesas estables de `sistemaService.ts`; `ErrorBoundary` captura los rechazos.
-- **Servicios**: toda petición pasa por `http.ts`, que valida `response.ok` y lanza `ApiError`. Los formularios permiten crear y editar dueños, mascotas y citas; los listados y detalles permiten eliminarlos. Se bloquea la eliminación de un dueño con mascotas o de una mascota con citas para evitar registros huérfanos. Los hooks `useFetch` / `useMutation` exponen `{ data, loading, error }` y `AsyncState` los pinta.
+- **HTTP**: Axios es el cliente compartido para los servicios; `alova.ts` adapta esa misma instancia a Alova. La sección Acerca de muestra una consulta real con `useRequest`.
+- **Formularios**: el formulario de servicios lee sus campos con `FormData` al enviar; los formularios existentes mantienen estado controlado. Los formularios permiten crear y editar dueños, mascotas y citas; los listados y detalles permiten eliminarlos. Se bloquea la eliminación de un dueño con mascotas o de una mascota con citas para evitar registros huérfanos. Los hooks `useFetch` / `useMutation` exponen `{ data, loading, error }` y `AsyncState` los pinta.

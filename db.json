@@ -39,11 +39,11 @@
   ],
   "mascotas": [
     {
-      "id": 1,
       "nombre": "Firulais",
       "especie": "Perro",
       "raza": "Labrador",
-      "duenoId": 1
+      "duenoId": 1,
+      "id": 1
     },
     {
       "id": 2,
@@ -86,13 +86,6 @@
       "raza": "Pitbull",
       "duenoId": 5,
       "id": 7
-    },
-    {
-      "nombre": "afs",
-      "especie": "Perro",
-      "raza": "aas",
-      "duenoId": 5,
-      "id": 8
     },
     {
       "nombre": "ala",
@@ -171,13 +164,6 @@
       "servicioId": 1,
       "estado": "Pendiente",
       "id": 6
-    },
-    {
-      "fecha": "2026-11-15",
-      "mascotaId": 8,
-      "servicioId": 4,
-      "estado": "Pendiente",
-      "id": 7
     }
   ]
 }

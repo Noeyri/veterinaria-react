@@ -13,6 +13,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@alova/adapter-axios": "^2.0.20",
+    "alova": "^3.5.5",
+    "axios": "^1.21.1",
     "bootstrap": "^5.3.3",
     "express": "^4.22.3",
     "react": "^19.0.0",
