@@ -171,6 +171,13 @@
       "servicioId": 1,
       "estado": "Pendiente",
       "id": 6
+    },
+    {
+      "fecha": "2026-11-15",
+      "mascotaId": 8,
+      "servicioId": 4,
+      "estado": "Pendiente",
+      "id": 7
     }
   ]
 }

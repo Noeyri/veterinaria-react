@@ -35,7 +35,8 @@ del frontend y `HOST=0.0.0.0` si el backend debe aceptar conexiones externas. Co
 estas variables en el entorno del proceso del backend; `.env.example` solo configura Vite.
 El almacenamiento de sesiones es en memoria, por lo que reiniciar el backend
 cerrará las sesiones activas. La API aplica permisos en servidor: Administración tiene
-acceso completo; Recepción gestiona dueños, mascotas y citas y consulta servicios; el
+acceso completo y puede crear, editar y eliminar servicios desde la sección Servicios;
+Recepción gestiona dueños, mascotas y citas y consulta el catálogo sin modificarlo; el
 Veterinario consulta los datos y solo puede cambiar el estado de una cita.
 
 Ejecuta `npm run test:auth` para validar autenticación y permisos de API.

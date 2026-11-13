@@ -1,7 +1,8 @@
 // Cliente HTTP base de la capa de servicios (Fetch API).
 // Todos los servicios de recursos (mascotas, citas, ...) pasan por aquí.
 
-const BASE_URL: string = (import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3001').replace(/\/+$/, '')
+const HOST = typeof window !== 'undefined' ? window.location.hostname : '127.0.0.1'
+const BASE_URL: string = (import.meta.env.VITE_API_URL ?? `http://${HOST}:3001`).replace(/\/+$/, '')
 
 export class ApiError extends Error {
   status: number

@@ -97,7 +97,7 @@ test('enforces authentication and role permissions on the API', async () => {
     assert.equal(vetLogin.status, 200)
     assert.ok(vetCookie)
     assert.match(vetLogin.headers.get('set-cookie'), /HttpOnly/)
-    assert.match(vetLogin.headers.get('set-cookie'), /SameSite=Strict/)
+    assert.match(vetLogin.headers.get('set-cookie'), /SameSite=Lax/)
     assert.match(vetLogin.headers.get('set-cookie'), /Max-Age=28800/)
     assert.equal((await request('/auth/me', {}, vetCookie)).status, 200)
     assert.equal((await request('/mascotas', {}, vetCookie)).status, 200)

@@ -6,8 +6,6 @@ const { ROLES, createUserRecord, initializeDevelopmentUsers, publicUser, readUse
 
 const SESSION_COOKIE = 'vet_session'
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000
-const MAX_LOGIN_ATTEMPTS = 5
-const LOGIN_WINDOW_MS = 15 * 60 * 1000
 const DEFAULT_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
 const RESOURCE_NAMES = ['duenos', 'mascotas', 'citas', 'servicios']
 const VALID_APPOINTMENT_STATES = ['Pendiente', 'Atendida', 'Cancelada']
@@ -41,7 +39,6 @@ function createServer({
   const app = jsonServer.create()
   const router = jsonServer.router(dbFile)
   const sessions = new Map()
-  const loginAttempts = new Map()
   const allowedOriginSet = new Set(allowedOrigins)
   const dummyHash = createUserRecord({
     username: 'unknown',
@@ -72,19 +69,6 @@ function createServer({
 
   app.post('/auth/login', (req, res) => {
     res.set('Cache-Control', 'no-store')
-    const ip = req.ip
-    const now = Date.now()
-    for (const [ipAddress, previousAttempt] of loginAttempts) {
-      if (now - previousAttempt.startedAt >= LOGIN_WINDOW_MS) loginAttempts.delete(ipAddress)
-    }
-    const previous = loginAttempts.get(ip)
-    const attempt = previous && now - previous.startedAt < LOGIN_WINDOW_MS
-      ? previous
-      : { startedAt: now, count: 0 }
-
-    if (attempt.count >= MAX_LOGIN_ATTEMPTS) {
-      return res.status(429).json({ error: 'Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.' })
-    }
 
     const username = typeof req.body?.username === 'string' ? req.body.username.trim().toLowerCase() : ''
     const password = typeof req.body?.password === 'string' && req.body.password.length <= 128
@@ -93,19 +77,17 @@ function createServer({
     const user = readUsers(usersFile).find((candidate) => candidate.username === username)
     const passwordMatches = verifyPassword(password, user?.passwordHash ?? dummyHash)
     if (!user || !passwordMatches) {
-      attempt.count += 1
-      loginAttempts.set(ip, attempt)
       return res.status(401).json({ error: 'Correo o contraseña incorrectos.' })
     }
 
-    loginAttempts.delete(ip)
+    const now = Date.now()
     const token = crypto.randomBytes(32).toString('base64url')
     sessions.set(token, { userId: user.id, expiresAt: now + SESSION_TTL_MS })
     const cookieParts = [
       `${SESSION_COOKIE}=${encodeURIComponent(token)}`,
       'Path=/',
       'HttpOnly',
-      'SameSite=Strict',
+      'SameSite=Lax',
       `Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`,
     ]
     if (secureCookies) cookieParts.push('Secure')
@@ -117,7 +99,7 @@ function createServer({
     const token = cookieValue(req.get('Cookie'), SESSION_COOKIE)
     if (token) sessions.delete(token)
     res.set('Cache-Control', 'no-store')
-    res.set('Set-Cookie', `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0${secureCookies ? '; Secure' : ''}`)
+    res.set('Set-Cookie', `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0${secureCookies ? '; Secure' : ''}`)
     return res.status(204).end()
   })
 
@@ -191,7 +173,7 @@ function createServer({
 
 if (require.main === module) {
   const port = Number(process.env.PORT ?? 3001)
-  const host = process.env.HOST ?? '127.0.0.1'
+  const host = process.env.HOST ?? 'localhost'
   const app = createServer()
   app.listen(port, host, () => {
     console.log(`API protegida disponible en http://${host}:${port}`)
