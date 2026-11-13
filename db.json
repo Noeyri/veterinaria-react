@@ -1,0 +1,176 @@
+{
+  "duenos": [
+    {
+      "nombre": "María Torres",
+      "telefono": "987654321",
+      "email": "maria@mail.com",
+      "id": 1
+    },
+    {
+      "id": 2,
+      "nombre": "Carlos Ramos",
+      "telefono": "912345678",
+      "email": "carlos@mail.com"
+    },
+    {
+      "id": 3,
+      "nombre": "Lucía Fernández",
+      "telefono": "956781234",
+      "email": "lucia@mail.com"
+    },
+    {
+      "id": 4,
+      "nombre": "Jorge Salazar",
+      "telefono": "934567890",
+      "email": "jorge@mail.com"
+    },
+    {
+      "nombre": "Noé Yrigoyen",
+      "telefono": "999666333",
+      "email": "jn01services@gmail.com",
+      "id": 5
+    },
+    {
+      "nombre": "Adriana",
+      "telefono": "987564655",
+      "email": "adri@gmail.com",
+      "id": 6
+    }
+  ],
+  "mascotas": [
+    {
+      "id": 1,
+      "nombre": "Firulais",
+      "especie": "Perro",
+      "raza": "Labrador",
+      "duenoId": 1
+    },
+    {
+      "id": 2,
+      "nombre": "Michi",
+      "especie": "Gato",
+      "raza": "Siamés",
+      "duenoId": 2
+    },
+    {
+      "id": 3,
+      "nombre": "Rocky",
+      "especie": "Perro",
+      "raza": "Bulldog",
+      "duenoId": 3
+    },
+    {
+      "id": 4,
+      "nombre": "Luna",
+      "especie": "Gato",
+      "raza": "Persa",
+      "duenoId": 1
+    },
+    {
+      "id": 5,
+      "nombre": "Kiwi",
+      "especie": "Ave",
+      "raza": "Periquito",
+      "duenoId": 4
+    },
+    {
+      "id": 6,
+      "nombre": "Toby",
+      "especie": "Perro",
+      "raza": "Beagle",
+      "duenoId": 2
+    },
+    {
+      "nombre": "Rosa",
+      "especie": "Perro",
+      "raza": "Pitbull",
+      "duenoId": 5,
+      "id": 7
+    },
+    {
+      "nombre": "afs",
+      "especie": "Perro",
+      "raza": "aas",
+      "duenoId": 5,
+      "id": 8
+    },
+    {
+      "nombre": "ala",
+      "especie": "Gato",
+      "raza": "Pitbull",
+      "duenoId": 1,
+      "id": 9
+    }
+  ],
+  "servicios": [
+    {
+      "id": 1,
+      "nombre": "Consulta general",
+      "precio": 50
+    },
+    {
+      "id": 2,
+      "nombre": "Vacunación",
+      "precio": 80
+    },
+    {
+      "id": 3,
+      "nombre": "Baño y corte",
+      "precio": 60
+    },
+    {
+      "id": 4,
+      "nombre": "Desparasitación",
+      "precio": 40
+    },
+    {
+      "id": 5,
+      "nombre": "Cirugía menor",
+      "precio": 350
+    }
+  ],
+  "citas": [
+    {
+      "id": 1,
+      "fecha": "2026-11-20",
+      "mascotaId": 1,
+      "servicioId": 2,
+      "estado": "Pendiente"
+    },
+    {
+      "id": 2,
+      "fecha": "2026-11-18",
+      "mascotaId": 2,
+      "servicioId": 1,
+      "estado": "Atendida"
+    },
+    {
+      "id": 3,
+      "fecha": "2026-11-22",
+      "mascotaId": 3,
+      "servicioId": 3,
+      "estado": "Pendiente"
+    },
+    {
+      "id": 4,
+      "fecha": "2026-11-10",
+      "mascotaId": 5,
+      "servicioId": 4,
+      "estado": "Cancelada"
+    },
+    {
+      "id": 5,
+      "fecha": "2026-11-25",
+      "mascotaId": 4,
+      "servicioId": 5,
+      "estado": "Pendiente"
+    },
+    {
+      "fecha": "2026-11-13",
+      "mascotaId": 3,
+      "servicioId": 1,
+      "estado": "Pendiente",
+      "id": 6
+    }
+  ]
+}
