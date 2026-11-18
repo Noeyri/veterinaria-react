@@ -1,9 +1,6 @@
-import { Suspense } from 'react'
 import { Link } from 'react-router-dom'
 import AsyncState from '../components/AsyncState'
-import AvisosSistema from '../components/AvisosSistema'
 import DataTable from '../components/DataTable'
-import ErrorBoundary from '../components/ErrorBoundary'
 import StatCard from '../components/StatCard'
 import { useSession } from '../context/SessionContext'
 import { useFetch } from '../hooks/useFetch'
@@ -33,19 +30,6 @@ export default function Inicio() {
           {usuario ? `Hola, ${usuario.nombre} · ${usuario.rol}` : 'Bienvenido a Veterinaria'}
         </p>
       </div>
-
-      <ErrorBoundary mensaje="No se pudieron cargar los avisos del sistema.">
-        <Suspense
-          fallback={
-            <div className="d-flex align-items-center gap-2 text-muted mb-4" role="status">
-              <div className="spinner-border spinner-border-sm text-success" aria-hidden="true"></div>
-              Cargando avisos...
-            </div>
-          }
-        >
-          <AvisosSistema />
-        </Suspense>
-      </ErrorBoundary>
 
       <AsyncState loading={loading} error={error} onRetry={reload}>
         <div className="row g-3 mb-4">
