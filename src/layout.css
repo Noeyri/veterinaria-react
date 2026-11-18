@@ -1,0 +1,18 @@
+/* Solo estructura (sin colores): barra lateral fija en pantallas grandes */
+.app-sidebar { width: 100%; }
+@media (min-width: 992px) {
+  .app-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+}
+
+.login-page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.login-card {
+  width: min(100%, 29rem);
+}

@@ -6,10 +6,10 @@ export const API_BASE_URL: string = (import.meta.env.VITE_API_URL ?? `http://${H
 export const axiosClient = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
+  timeout: 5000,
   headers: { 'Content-Type': 'application/json' },
   transitional: { silentJSONParsing: false },
 })
-
 export class ApiError extends Error {
   status: number
 

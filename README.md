@@ -42,11 +42,11 @@ Veterinario consulta los datos y solo puede cambiar el estado de una cita.
 Ejecuta `npm run test:auth` para validar autenticación y permisos de API.
 
 ## Estructura
-- `src/context` – `ThemeContext` (tema claro/oscuro) y `SessionContext` (sesión), consumidos con `useContext`
+- `src/context` – `ThemeContext` (tema claro/oscuro), `SessionContext` (sesión) y `FiltroContext` (filtro de especie compartido entre páginas), consumidos con `useContext`
 - `backend` – API Express protegida, autenticación de sesión, permisos por rol y alta local de cuentas
-- `src/services` – capa de datos: `http.ts` (Axios con cookie y errores normalizados), `alova.ts` (Alova sobre la misma instancia Axios), un servicio por recurso (`getAll`, `getById`, `create`, `update`, `delete` → GET/POST/PUT/DELETE), `authService.ts` y `sistemaService.ts` (promesas locales estables para `use()`)
+- `src/services` – capa de datos: `http.ts` (Axios con cookie y errores normalizados), `alova.ts` (Alova sobre la misma instancia Axios), un servicio por recurso (`getAll`, `getById`, `create`, `update`, `delete` → GET/POST/PUT/DELETE), `authService.ts` y `sistemaService.ts` (promesas locales estables para `use()`) ; `serviciosFetchService.ts` (ejemplo con Fetch API nativo: `response.ok`, `JSON.stringify`). Axios usa `timeout: 5000`.
 - `src/hooks` – `useFetch` (GET) y `useMutation` (escrituras) con estados `loading`, `data` y `error`
-- `src/components` – Navbar, tarjetas (`PetCard`, `ServiceCard`), formularios, `AsyncState`, `ErrorBoundary`, `AvisosSistema`, `DuenoForm`, `FooterClinica`
+- `src/components` – `Layout` (Navbar + contenido + footer, recibe `children`), `Navbar`, tarjetas (`PetCard`, `ServiceCard`, `StatCard`), `FiltroChips` / `FiltroEspecie`, formularios, `AsyncState`, `ErrorBoundary`, `AvisosSistema`, `FooterClinica`, `SearchInput`, `DataTable`, `DeleteButton`
 - `src/pages` – vistas de la aplicación
 - `db.json` – datos activos de la API
 - `db.restore.json` – copia de los datos iniciales para restaurar la base
@@ -78,3 +78,27 @@ copia inicial para futuras restauraciones.
 - **use() + Suspense**: `AvisosSistema` (en Inicio) y `FooterClinica` (en App) leen promesas estables de `sistemaService.ts`; `ErrorBoundary` captura los rechazos.
 - **HTTP**: Axios es el cliente compartido para los servicios; `alova.ts` adapta esa misma instancia a Alova. La sección Acerca de muestra una consulta real con `useRequest`.
 - **Formularios**: el formulario de servicios lee sus campos con `FormData` al enviar; los formularios existentes mantienen estado controlado. Los formularios permiten crear y editar dueños, mascotas y citas; los listados y detalles permiten eliminarlos. Se bloquea la eliminación de un dueño con mascotas o de una mascota con citas para evitar registros huérfanos. Los hooks `useFetch` / `useMutation` exponen `{ data, loading, error }` y `AsyncState` los pinta.
+
+## Integración y arquitectura (S11–S15)
+
+Flujo: **URL → Routes → Página → Componentes → Hooks → Servicio → API → UI**
+
+| Semana | Tema | Dónde está |
+|---|---|---|
+| S11 | Vite, JSX/TSX, Bootstrap, `map()`, interfaces tipadas | `main.tsx`, `types/index.ts`, `PetCard`, `ServiceCard` |
+| S12 | Router, `NavLink`, `Layout`, ruta 404, formularios con `FormData` | `App.tsx`, `Layout.tsx`, `Navbar.tsx`, `NotFound.tsx`, `Servicios.tsx` |
+| S13 | `useState`, `useContext`, `useRef`, `use()` + Suspense | `ThemeContext`, `SessionContext`, `Mascotas.tsx` (botón "Ir al buscador"), `AvisosSistema`, `FooterClinica` |
+| S14 | Fetch, Axios, Alova | `serviciosFetchService.ts`, `http.ts`, `alova.ts`, `AcercaDe.tsx` |
+| S15 | Integración: filtro compartido, loading/error, GET/POST en Network | `FiltroContext`, `FiltroChips`, `AsyncState`, `useFetch`, `useMutation` |
+
+### Distribución de pantallas
+- **Inicio:** bienvenida y resumen (mascotas, citas pendientes, servicios) a la izquierda; citas recientes a la derecha.
+- **Listados (Mascotas, Citas):** título + botón "Nueva" → buscador → chips de filtro → lista → "Mostrando X de Y".
+
+### Prueba integral (checklist PC3)
+1. Abrir `/mascotas` → GET `200` visible en DevTools → Network → Fetch/XHR.
+2. El spinner de carga desaparece y se muestran las tarjetas.
+3. Ir a **Registro** → validar campos → POST `201` en Network.
+4. Volver al listado → el registro nuevo aparece.
+5. Detener la API (`Ctrl+C` en `npm run api`) y recargar → se muestra el error con "Reintentar".
+6. Consola del navegador sin errores.

@@ -1,8 +1,5 @@
-import { Suspense } from 'react'
 import { Link, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
-import ErrorBoundary from './components/ErrorBoundary'
-import FooterClinica from './components/FooterClinica'
-import Navbar from './components/Navbar'
+import Layout from './components/Layout'
 import { useSession } from './context/SessionContext'
 import AcercaDe from './pages/AcercaDe'
 import CitaDetalle from './pages/CitaDetalle'
@@ -39,33 +36,24 @@ function RequireSession() {
 }
 
 export default function App() {
-  return (
-    <>
-      <Navbar />
-      <main className="container py-4">
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route element={<RequireSession />}>
-            <Route path="/" element={<Inicio />} />
-            <Route path="/mascotas" element={<Mascotas />} />
-            <Route path="/mascotas/:id" element={<MascotaDetalle />} />
-            <Route path="/citas" element={<Citas />} />
-            <Route path="/citas/:id" element={<CitaDetalle />} />
-            <Route path="/duenos" element={<Duenos />} />
-            <Route path="/servicios" element={<Servicios />} />
-            <Route path="/registro" element={<Registro />} />
-            <Route path="/acerca-de" element={<AcercaDe />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <div className="container">
-        <ErrorBoundary mensaje="No se pudo cargar la configuración de la clínica.">
-          <Suspense fallback={<p className="text-center text-muted small py-3">Cargando configuración...</p>}>
-            <FooterClinica />
-          </Suspense>
-        </ErrorBoundary>
-      </div>
-    </>
+  const { pathname } = useLocation()
+  const routes = (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route element={<RequireSession />}>
+        <Route path="/" element={<Inicio />} />
+        <Route path="/mascotas" element={<Mascotas />} />
+        <Route path="/mascotas/:id" element={<MascotaDetalle />} />
+        <Route path="/citas" element={<Citas />} />
+        <Route path="/citas/:id" element={<CitaDetalle />} />
+        <Route path="/duenos" element={<Duenos />} />
+        <Route path="/servicios" element={<Servicios />} />
+        <Route path="/registro" element={<Registro />} />
+        <Route path="/acerca-de" element={<AcercaDe />} />
+      </Route>
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   )
+
+  return pathname.replace(/\/+$/, '') === '/login' ? routes : <Layout>{routes}</Layout>
 }

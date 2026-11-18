@@ -86,13 +86,6 @@
       "raza": "Pitbull",
       "duenoId": 5,
       "id": 7
-    },
-    {
-      "nombre": "ala",
-      "especie": "Gato",
-      "raza": "Pitbull",
-      "duenoId": 1,
-      "id": 9
     }
   ],
   "servicios": [
@@ -124,11 +117,11 @@
   ],
   "citas": [
     {
-      "id": 1,
       "fecha": "2026-11-20",
       "mascotaId": 1,
       "servicioId": 2,
-      "estado": "Pendiente"
+      "estado": "Atendida",
+      "id": 1
     },
     {
       "id": 2,

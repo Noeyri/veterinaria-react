@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 127.0.0.1",
+    "dev": "vite --host localhost --open",
     "api": "node backend/server.cjs",
     "user:create": "node backend/create-user.cjs",
     "test:auth": "node --test backend/server.test.cjs",

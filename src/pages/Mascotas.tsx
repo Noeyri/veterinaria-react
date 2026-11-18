@@ -8,6 +8,8 @@ import { useFetch } from '../hooks/useFetch'
 import { citasService } from '../services/citasService'
 import { duenosService } from '../services/duenosService'
 import { mascotasService } from '../services/mascotasService'
+import FiltroEspecie from '../components/FiltroEspecie'
+import { useFiltro } from '../context/FiltroContext'
 
 export default function Mascotas() {
   const { usuario } = useSession()
@@ -16,7 +18,7 @@ export default function Mascotas() {
     Promise.all([mascotasService.getAll(), duenosService.getAll()]),
   )
   const [busqueda, setBusqueda] = useState('')
-  const [especie, setEspecie] = useState('Todas')
+  const { filtroEspecie: especie, setFiltroEspecie } = useFiltro()
   const buscarRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function Mascotas() {
 
   const limpiar = () => {
     setBusqueda('')
-    setEspecie('Todas')
+    setFiltroEspecie('Todas')
     buscarRef.current?.focus()
   }
 
@@ -60,27 +62,20 @@ export default function Mascotas() {
         {puedeGestionar && <Link to="/registro?tab=mascota" className="btn btn-success btn-sm">+ Nueva mascota</Link>}
       </div>
 
-      <div className="row g-2 mb-3">
-        <div className="col-md-6">
+      <div className="d-flex flex-wrap gap-2 mb-2">
+        <div className="flex-grow-1">
           <SearchInput ref={buscarRef} value={busqueda} onChange={setBusqueda}
             placeholder="Buscar por nombre, raza o dueño..." />
         </div>
-        <div className="col-md-4">
-          <select className="form-select" value={especie} onChange={(e) => setEspecie(e.target.value)}>
-            <option>Todas</option>
-            <option>Perro</option>
-            <option>Gato</option>
-            <option>Ave</option>
-            <option>Otro</option>
-          </select>
-        </div>
-        <div className="col-md-2">
-          <button className="btn btn-outline-secondary w-100" onClick={limpiar}>Limpiar</button>
-        </div>
+        <button type="button" className="btn btn-outline-primary" onClick={() => buscarRef.current?.focus()}>
+          Ir al buscador
+        </button>
+        <button type="button" className="btn btn-outline-secondary" onClick={limpiar}>Limpiar</button>
       </div>
-
+      <div className="mb-3">
+        <FiltroEspecie />
+      </div>
       <AsyncState loading={loading} error={error} onRetry={reload}>
-        <p className="text-muted small">{filtradas.length} resultado(s)</p>
         {filtradas.length === 0 ? (
           <div className="alert alert-info">No se encontraron mascotas.</div>
         ) : (
@@ -98,6 +93,7 @@ export default function Mascotas() {
             ))}
           </div>
         )}
+        <p className="text-muted small mt-3 mb-0">Mostrando {filtradas.length} de {mascotas?.length ?? 0} mascotas</p>
       </AsyncState>
     </>
   )

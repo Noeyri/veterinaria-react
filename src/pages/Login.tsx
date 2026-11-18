@@ -2,9 +2,11 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useSession } from '../context/SessionContext'
 import { ApiError } from '../services/http'
+import { useTheme } from '../context/ThemeContext'
 
 export default function Login() {
   const { usuario, cargando: verificandoSesion, error: errorSesion, login, verificarSesion } = useSession()
+  const { theme, toggleTheme } = useTheme()
   const location = useLocation()
   const usernameRef = useRef<HTMLInputElement>(null)
   const [username, setUsername] = useState('')
@@ -38,9 +40,18 @@ export default function Login() {
   }
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-md-6 col-lg-4">
-        <h1 className="h3 mb-3">Ingresar</h1>
+    <main className="login-page">
+      <button
+        type="button"
+        className="btn btn-outline-secondary position-fixed top-0 end-0 m-3"
+        onClick={toggleTheme}
+        aria-label={theme === 'light' ? 'Cambiar a modo oscuro' : 'Cambiar a modo claro'}
+        title={theme === 'light' ? 'Modo oscuro' : 'Modo claro'}
+      >
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
+      <div className="login-card">
+        <h1 className="h3 mb-3 text-center">Ingresar</h1>
         <form onSubmit={handleSubmit} className="card card-body shadow-sm">
           {errorSesion && (
             <div className="alert alert-warning" role="alert">
@@ -77,7 +88,7 @@ export default function Login() {
           )}
         </form>
       </div>
-    </div>
+    </main>
   )
 }
 

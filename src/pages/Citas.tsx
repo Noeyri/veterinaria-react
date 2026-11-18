@@ -9,7 +9,8 @@ import { useFetch } from '../hooks/useFetch'
 import { citasService } from '../services/citasService'
 import { mascotasService } from '../services/mascotasService'
 import { serviciosService } from '../services/serviciosService'
-
+import FiltroChips from '../components/FiltroChips'
+const estados = ['Todos', 'Pendiente', 'Atendida', 'Cancelada'] as const
 const badge = { Pendiente: 'warning', Atendida: 'success', Cancelada: 'secondary' } as const
 
 export default function Citas() {
@@ -19,7 +20,7 @@ export default function Citas() {
     Promise.all([citasService.getAll(), mascotasService.getAll(), serviciosService.getAll()]),
   )
   const [busqueda, setBusqueda] = useState('')
-  const [estado, setEstado] = useState('Todos')
+  const [estado, setEstado] = useState<(typeof estados)[number]>('Todos')
   const buscarRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -51,19 +52,12 @@ export default function Citas() {
         <h1 className="h3 mb-0">Citas</h1>
         {puedeGestionar && <Link to="/registro?tab=cita" className="btn btn-success btn-sm">+ Nueva cita</Link>}
       </div>
-      <div className="row g-2 mb-3">
-        <div className="col-md-8">
-          <SearchInput ref={buscarRef} value={busqueda} onChange={setBusqueda}
-            placeholder="Buscar por mascota, servicio o fecha..." />
-        </div>
-        <div className="col-md-4">
-          <select className="form-select" value={estado} onChange={(e) => setEstado(e.target.value)}>
-            <option>Todos</option>
-            <option>Pendiente</option>
-            <option>Atendida</option>
-            <option>Cancelada</option>
-          </select>
-        </div>
+      <div className="mb-2">
+        <SearchInput ref={buscarRef} value={busqueda} onChange={setBusqueda}
+          placeholder="Buscar por mascota, servicio o fecha..." />
+      </div>
+      <div className="mb-3">
+        <FiltroChips opciones={estados} valor={estado} onChange={setEstado} etiqueta="Filtrar por estado" />
       </div>
 
       <AsyncState loading={loading} error={error} onRetry={reload}>
@@ -95,6 +89,7 @@ export default function Citas() {
             </tr>
           ))}
         </DataTable>
+        <p className="text-muted small mt-3 mb-0">Mostrando {filtradas.length} de {citas?.length ?? 0} citas</p>
       </AsyncState>
     </>
   )
